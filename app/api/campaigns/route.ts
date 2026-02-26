@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Name and at least one keyword are required' }, { status: 400 })
   }
 
-  const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  const base = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  const suffix = Math.random().toString(36).slice(2, 6)
+  const slug = `${base}-${suffix}`
 
   const { data: campaign, error } = await supabase
     .from('campaigns')
