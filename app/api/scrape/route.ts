@@ -4,7 +4,7 @@ import { runScrape, ApifyTweet } from '@/lib/apify'
 import { subDays, format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
-  const { campaignId, days = 7 } = await req.json()
+  const { campaignId } = await req.json()
 
   if (!campaignId) {
     return NextResponse.json({ error: 'campaignId is required' }, { status: 400 })
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   const keywords = campaign.keywords.map((k: { keyword: string }) => k.keyword)
+  const days = campaign.scrape_days ?? 7
   const since = format(subDays(new Date(), days), 'yyyy-MM-dd')
   const until = format(new Date(), 'yyyy-MM-dd')
 
@@ -39,8 +40,19 @@ export async function POST(req: NextRequest) {
   try {
     const tweets = await runScrape(keywords, since, until)
 
+    const minEng = campaign.min_engagement ?? 0
+    const maxEng = campaign.max_engagement ?? null
+
+    // Filter by engagement thresholds (likes + retweets + replies)
+    const filtered = tweets.filter((t: ApifyTweet) => {
+      const score = (t.likeCount ?? 0) + (t.retweetCount ?? 0) + (t.replyCount ?? 0)
+      if (score < minEng) return false
+      if (maxEng !== null && score > maxEng) return false
+      return true
+    })
+
     // Upsert posts (tweet ID as primary key prevents duplicates)
-    const posts = tweets.map((t: ApifyTweet) => ({
+    const posts = filtered.map((t: ApifyTweet) => ({
       id: t.id,
       campaign_id: campaignId,
       scrape_run_id: scrapeRun.id,

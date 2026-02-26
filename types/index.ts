@@ -4,6 +4,9 @@ export type Campaign = {
   slug: string
   description: string | null
   active: boolean
+  scrape_days: number
+  min_engagement: number
+  max_engagement: number | null
   created_at: string
   keywords?: Keyword[]
 }

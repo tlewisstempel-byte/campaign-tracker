@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Campaign } from '@/types'
+import NewCampaignModal from '@/components/NewCampaignModal'
 
-export const revalidate = 60
+export const revalidate = 0
 
 export default async function CampaignsPage() {
   const { data: campaigns } = await supabase
@@ -13,8 +14,13 @@ export default async function CampaignsPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-1">Campaign Tracker</h1>
-        <p className="text-zinc-400 text-sm mb-8">Track X mentions and metrics per campaign</p>
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold mb-1">Campaign Tracker</h1>
+            <p className="text-zinc-400 text-sm">Track X mentions and metrics per campaign</p>
+          </div>
+          <NewCampaignModal />
+        </div>
 
         <div className="grid gap-4">
           {campaigns?.map((campaign: Campaign) => (
