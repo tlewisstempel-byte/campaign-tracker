@@ -1,5 +1,5 @@
-// Actor ID for the Twitter scraper - update if you switch actors
 const ACTOR_ID = 'apidojo/tweet-scraper'
+const BASE = 'https://api.apify.com/v2'
 
 export type ApifyTweet = {
   id: string
@@ -23,20 +23,36 @@ export async function runScrape(
   until: string,
   maxItems = 500
 ): Promise<ApifyTweet[]> {
-  const { ApifyClient } = await import('apify-client')
-  const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN! })
-
-  // Embed date filters directly in each query (Twitter advanced search syntax)
+  const token = process.env.APIFY_API_TOKEN!
   const searchTerms = keywords.map(k => `${k} since:${since} until:${until}`)
 
-  const run = await client.actor(ACTOR_ID).call({
-    searchTerms,
-    maxItems,
-    addUserInfo: true,
-    lang: 'en',
-    queryType: 'Latest',
-  })
+  // Start the actor run
+  const startRes = await fetch(
+    `${BASE}/acts/${encodeURIComponent(ACTOR_ID)}/runs?token=${token}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ searchTerms, maxItems, addUserInfo: true, lang: 'en', queryType: 'Latest' }),
+    }
+  )
+  if (!startRes.ok) throw new Error(`Failed to start actor: ${await startRes.text()}`)
+  const { data: run } = await startRes.json()
 
-  const { items } = await client.dataset(run.defaultDatasetId).listItems()
-  return items as ApifyTweet[]
+  // Poll until finished (max ~4 min)
+  const runId = run.id
+  for (let i = 0; i < 48; i++) {
+    await new Promise(r => setTimeout(r, 5000))
+    const statusRes = await fetch(`${BASE}/actor-runs/${runId}?token=${token}`)
+    const { data: status } = await statusRes.json()
+    if (status.status === 'SUCCEEDED') {
+      const itemsRes = await fetch(
+        `${BASE}/datasets/${status.defaultDatasetId}/items?token=${token}&clean=true`
+      )
+      return itemsRes.json() as Promise<ApifyTweet[]>
+    }
+    if (status.status === 'FAILED' || status.status === 'ABORTED' || status.status === 'TIMED-OUT') {
+      throw new Error(`Actor run ${status.status}`)
+    }
+  }
+  throw new Error('Actor run timed out waiting for results')
 }
