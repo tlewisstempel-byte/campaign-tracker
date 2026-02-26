@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import MetricsSummary from '@/components/MetricsSummary'
 import PostsTable from '@/components/PostsTable'
 import ScrapeButton from '@/components/ScrapeButton'
+import DeleteCampaignButton from '@/components/DeleteCampaignButton'
 
 export const revalidate = 0
 
@@ -61,7 +62,10 @@ export default async function CampaignPage({ params }: Props) {
               </p>
             )}
           </div>
-          <ScrapeButton campaignId={campaign.id} />
+          <div className="flex items-center gap-3">
+            <DeleteCampaignButton campaignId={campaign.id} />
+            <ScrapeButton campaignId={campaign.id} />
+          </div>
         </div>
 
         {/* Metrics */}
