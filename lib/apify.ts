@@ -1,4 +1,4 @@
-const ACTOR_ID = 'apidojo/tweet-scraper'
+const ACTOR_ID = '61RPP7dywgiy0JPD0'
 const BASE = 'https://api.apify.com/v2'
 
 export type ApifyTweet = {
@@ -48,7 +48,9 @@ export async function runScrape(
       const itemsRes = await fetch(
         `${BASE}/datasets/${status.defaultDatasetId}/items?token=${token}&clean=true`
       )
-      return itemsRes.json() as Promise<ApifyTweet[]>
+      const items = await itemsRes.json()
+      console.log('[apify] items count:', items?.length, 'first item:', JSON.stringify(items?.[0], null, 2))
+      return items as ApifyTweet[]
     }
     if (status.status === 'FAILED' || status.status === 'ABORTED' || status.status === 'TIMED-OUT') {
       throw new Error(`Actor run ${status.status}`)
