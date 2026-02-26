@@ -32,7 +32,7 @@ export async function runScrape(
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ searchTerms, maxItems, addUserInfo: true, lang: 'en', queryType: 'Latest' }),
+      body: JSON.stringify({ searchTerms, maxItems, tweetLanguage: 'en', sort: 'Latest' }),
     }
   )
   if (!startRes.ok) throw new Error(`Failed to start actor: ${await startRes.text()}`)
