@@ -12,7 +12,7 @@ export default async function CampaignsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 p-8">
+    <main className="min-h-screen text-zinc-100 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-start justify-between mb-8">
           <div>

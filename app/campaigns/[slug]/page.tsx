@@ -40,7 +40,7 @@ export default async function CampaignPage({ params }: Props) {
   const metrics = computeMetrics((posts ?? []) as Post[])
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 p-8">
+    <main className="min-h-screen text-zinc-100 p-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
