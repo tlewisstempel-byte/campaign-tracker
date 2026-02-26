@@ -1,7 +1,3 @@
-import { ApifyClient } from 'apify-client'
-
-const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN! })
-
 // Actor ID for the Twitter scraper - update if you switch actors
 const ACTOR_ID = 'apidojo/tweet-scraper'
 
@@ -27,6 +23,9 @@ export async function runScrape(
   until: string,
   maxItems = 500
 ): Promise<ApifyTweet[]> {
+  const { ApifyClient } = await import('apify-client')
+  const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN! })
+
   const run = await client.actor(ACTOR_ID).call({
     searchTerms: keywords,
     since,
