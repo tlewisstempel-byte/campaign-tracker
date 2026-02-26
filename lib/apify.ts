@@ -26,13 +26,15 @@ export async function runScrape(
   const { ApifyClient } = await import('apify-client')
   const client = new ApifyClient({ token: process.env.APIFY_API_TOKEN! })
 
+  // Embed date filters directly in each query (Twitter advanced search syntax)
+  const searchTerms = keywords.map(k => `${k} since:${since} until:${until}`)
+
   const run = await client.actor(ACTOR_ID).call({
-    searchTerms: keywords,
-    since,
-    until,
+    searchTerms,
     maxItems,
     addUserInfo: true,
     lang: 'en',
+    queryType: 'Latest',
   })
 
   const { items } = await client.dataset(run.defaultDatasetId).listItems()
