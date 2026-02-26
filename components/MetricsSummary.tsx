@@ -1,4 +1,5 @@
 import { CampaignMetrics } from '@/types'
+import { fmt } from '@/lib/utils'
 
 type Props = { metrics: CampaignMetrics }
 
@@ -10,12 +11,6 @@ const statCards: { label: string; key: keyof CampaignMetrics; suffix?: string }[
   { label: 'Views', key: 'totalViews' },
   { label: 'Eng. Rate', key: 'engagementRate', suffix: '%' },
 ]
-
-function fmt(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
-  return n.toString()
-}
 
 export default function MetricsSummary({ metrics }: Props) {
   return (
