@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       .from('posts')
       .upsert(posts, { onConflict: 'id' })
 
-    if (insertError) throw insertError
+    if (insertError) throw new Error(insertError.message)
 
     // Mark run as completed
     await supabase
@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
       .update({ status: 'failed', completed_at: new Date().toISOString() })
       .eq('id', scrapeRun.id)
 
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const message = err instanceof Error ? err.message : JSON.stringify(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
