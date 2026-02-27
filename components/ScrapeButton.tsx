@@ -24,7 +24,7 @@ export default function ScrapeButton({ campaignId }: Props) {
       // Reload page data after scrape
       setTimeout(() => window.location.reload(), 1500)
     } catch (err) {
-      setResult(String(err))
+      setResult(err instanceof Error ? err.message : String(err))
       setStatus('error')
     }
   }
