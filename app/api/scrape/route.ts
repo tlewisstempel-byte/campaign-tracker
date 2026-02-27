@@ -52,22 +52,27 @@ export async function POST(req: NextRequest) {
     })
 
     // Upsert posts (tweet ID as primary key prevents duplicates)
-    const posts = filtered.map((t: ApifyTweet) => ({
-      id: t.id,
-      campaign_id: campaignId,
-      scrape_run_id: scrapeRun.id,
-      matched_keyword: null,
-      text: t.text,
-      author_handle: t.author?.userName ?? null,
-      author_name: t.author?.displayName ?? null,
-      author_followers: t.author?.followers ?? null,
-      posted_at: t.createdAt ?? null,
-      likes: t.likeCount ?? 0,
-      retweets: t.retweetCount ?? 0,
-      replies: t.replyCount ?? 0,
-      views: t.viewCount ?? 0,
-      url: t.url ?? null,
-    }))
+    const seen = new Set<string>()
+    const posts = filtered.flatMap((t: ApifyTweet) => {
+      if (!t.id || seen.has(t.id)) return []
+      seen.add(t.id)
+      return [{
+        id: t.id,
+        campaign_id: campaignId,
+        scrape_run_id: scrapeRun.id,
+        matched_keyword: null,
+        text: t.text,
+        author_handle: t.author?.userName ?? null,
+        author_name: t.author?.displayName ?? null,
+        author_followers: t.author?.followers ?? null,
+        posted_at: t.createdAt ?? null,
+        likes: t.likeCount ?? 0,
+        retweets: t.retweetCount ?? 0,
+        replies: t.replyCount ?? 0,
+        views: t.viewCount ?? 0,
+        url: t.url ?? null,
+      }]
+    })
 
     const { error: insertError } = await supabase
       .from('posts')
