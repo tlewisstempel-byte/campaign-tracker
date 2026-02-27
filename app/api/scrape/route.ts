@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { runScrape, ApifyTweet } from '@/lib/apify'
+import { runScrape, Tweet } from '@/lib/twitter'
 import { subDays, format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     const maxEng = campaign.max_engagement ?? null
 
     // Filter by engagement thresholds (likes + retweets + replies)
-    const filtered = tweets.filter((t: ApifyTweet) => {
+    const filtered = tweets.filter((t: Tweet) => {
       const score = (t.likeCount ?? 0) + (t.retweetCount ?? 0) + (t.replyCount ?? 0)
       if (score < minEng) return false
       if (maxEng !== null && score > maxEng) return false
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // Upsert posts (tweet ID as primary key prevents duplicates)
     const seen = new Set<string>()
-    const posts = filtered.flatMap((t: ApifyTweet) => {
+    const posts = filtered.flatMap((t: Tweet) => {
       if (!t.id || seen.has(t.id)) return []
       seen.add(t.id)
       return [{

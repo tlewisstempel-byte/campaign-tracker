@@ -1,6 +1,6 @@
 const BASE = 'https://api.twitterapi.io/twitter/tweet/advanced_search'
 
-export type ApifyTweet = {
+export type Tweet = {
   id: string
   text: string
   createdAt: string
@@ -52,9 +52,9 @@ export async function runScrape(
   since: string,
   until: string,
   maxItems = 500
-): Promise<ApifyTweet[]> {
+): Promise<Tweet[]> {
   const apiKey = process.env.TWITTERAPI_KEY!
-  const all: ApifyTweet[] = []
+  const all: Tweet[] = []
 
   for (const keyword of keywords) {
     const query = `${keyword} since:${since} until:${until} lang:en`
