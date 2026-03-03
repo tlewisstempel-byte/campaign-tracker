@@ -49,6 +49,11 @@ create index on posts(campaign_id);
 create index on posts(posted_at desc);
 create index on scrape_runs(campaign_id);
 
+-- Migration: Base on-chain registration
+-- Run this in Supabase SQL editor after initial setup
+-- alter table campaigns add column base_tx_hash text;
+-- alter table campaigns add column base_registered_at timestamptz;
+
 -- Seed the first campaign
 insert into campaigns (name, slug, description) values
   ('Fableborne', 'fableborne', 'Tracking Fableborne and $POWER token mentions on X');

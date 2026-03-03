@@ -6,6 +6,7 @@ import MetricsSummary from '@/components/MetricsSummary'
 import PostsTable from '@/components/PostsTable'
 import ScrapeButton from '@/components/ScrapeButton'
 import DeleteCampaignButton from '@/components/DeleteCampaignButton'
+import RegisterOnBase from '@/components/RegisterOnBase'
 
 export const revalidate = 0
 
@@ -63,6 +64,12 @@ export default async function CampaignPage({ params }: Props) {
             )}
           </div>
           <div className="flex items-center gap-3">
+            <RegisterOnBase
+              campaignId={campaign.id}
+              campaignName={campaign.name}
+              keywords={campaign.keywords?.map((k: { keyword: string }) => k.keyword) ?? []}
+              txHash={campaign.base_tx_hash}
+            />
             <DeleteCampaignButton campaignId={campaign.id} />
             <ScrapeButton campaignId={campaign.id} />
           </div>
